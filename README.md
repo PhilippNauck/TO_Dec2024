@@ -4,6 +4,9 @@ This repository is dedicated to the submission of open-source designs based on t
 
 ReadTheDocs documentation for IHP-Open-DesignLib is [here](https://ihp-open-ip.readthedocs.io/en/latest/)
 
+> [!IMPORTANT]  
+> Submission deadline is **November 22**.
+
 ## Physical design constraint
 
 1. Please align with the layout design rules which can be found [here](https://github.com/IHP-GmbH/IHP-Open-PDK/blob/main/ihp-sg13g2/libs.doc/doc/SG13G2_os_layout_rules.pdf)
