@@ -39,59 +39,31 @@ on:
                 default: 'file1.txt,file2.txt'
 
 jobs:
-    copy_repo:
-        runs-on: ubuntu-22.04
-        steps:
-            -   name: Get all files
-                uses: actions/checkout@master
-            -   name: list
-                run: ls
-    install_Klayout:
-        needs: copy_repo
-        runs-on: ubuntu-22.04
-        steps:
-            -   name: Get all files
-                uses: actions/checkout@master
+    # copy_repo:
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         -   name: Get all files
+    #             uses: actions/checkout@master
+    #         -   name: list
+    #             run: ls
+    # install_Klayout:
+    #     needs: copy_repo
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         -   name: Get all files
+    #             uses: actions/checkout@master
 
-            -   name: apt update
-                run: sudo apt update -qq -y
+    #         -   name: apt update
+    #             run: sudo apt update -qq -y
 
-            -   name: Installing Klayout
-                run: sudo dpkg -i ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
+    #         -   name: Installing Klayout
+    #             run: sudo dpkg -i ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
 
-            -   name: apt install
-                run: sudo apt install -f -y
+    #         -   name: apt install
+    #             run: sudo apt install -f -y
     
-            -   name: check installation
-                run: klayout -v
-
-    install-python:
-        runs-on: ubuntu-22.04
-        outputs:
-            python-installed: ${{ steps.python-setup.outputs.success }}
-        steps:
-        -   name: Install Python
-            id: python-setup
-            run: |
-                sudo apt-get update
-                sudo apt-get install -y python3
-                echo "::set-output name=success::true"
-        -   name: Verify Python
-            run: python3 --version
-
-    install-nodejs:
-        runs-on: ubuntu-22.04
-        outputs:
-            nodejs-installed: ${{ steps.node-setup.outputs.success }}
-        steps:
-        -   name: Install Node.js
-            id: node-setup
-            run: |
-                curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
-                sudo apt-get install -y nodejs
-                echo "::set-output name=success::true"
-        -   name: Verify Node.js
-            run: node --version
+    #         -   name: check installation
+    #             run: klayout -v
 
     install-klayout:
         runs-on: ubuntu-22.04
@@ -110,18 +82,20 @@ jobs:
                 echo "::set-output name=success::true"
         -   name: Verify klayout
             run: klayout -v
+        -   name: Upload KLayout Configuration
+            uses: actions/upload-artifact@v3
+            with:
+                name: klayout-config
+                path: ~/.klayout
 
     process-files:
-        needs: [install-python, install-nodejs, install-klayout]
+        needs: [install-klayout]
         runs-on: ubuntu-22.04
         steps:
-        -   name: Verify Python Installation
-            if: ${{ needs.install-python.outputs.python-installed == 'true' }}
-            run: python3 --version
-
-        -   name: Verify Node.js Installation
-            if: ${{ needs.install-nodejs.outputs.nodejs-installed == 'true' }}
-            run: node --version
+        -   name: Download KLayout Configuration
+            uses: actions/download-artifact@v3
+            with:
+                name: klayout-config
 
         -   name: Verify Klayout Installation
             if: ${{ needs.install-klayout.outputs.klayout-installed == 'true' }}
@@ -130,8 +104,6 @@ jobs:
         -   name: Use installed programs
             run: |
                 echo "All installations successful. Running tasks..."
-                python3 -c "print('Python is ready!')"
-                node -e "console.log('Node.js is ready!')"
                 klayout -v
 
     # test_Klayout:
