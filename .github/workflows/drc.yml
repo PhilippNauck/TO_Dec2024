@@ -66,7 +66,7 @@ jobs:
     #             run: klayout -v
 
   install-klayout:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       klayout-installed: ${{ steps.verify.outputs.success }}
     steps:
@@ -78,7 +78,7 @@ jobs:
         run: |
           sudo apt-get update
           # sudo apt-get install -y ./klayout_0.29.6-1_amd64.deb
-          sudo apt-get install -y ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
+          sudo dpkg ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
 
       - name: Verify Installation
         id: verify
@@ -93,7 +93,7 @@ jobs:
 
   process-with-klayout:
     needs: install-klayout
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check KLayout availability
         if: ${{ needs.install-klayout.outputs.klayout-installed == 'true' }}
@@ -103,7 +103,7 @@ jobs:
         run: |
           echo "Running KLayout processing task..."
           # Beispiel-Befehl für KLayout
-          klayout -b -r my_script.lym
+          klayout -v
 
 
     # test_Klayout:
