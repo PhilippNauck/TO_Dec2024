@@ -93,20 +93,6 @@ jobs:
         -   name: Verify Node.js
             run: node --version
 
-    install-go:
-        runs-on: ubuntu-latest
-        outputs:
-            go-installed: ${{ steps.go-setup.outputs.success }}
-        steps:
-        -   name: Install Go
-            id: go-setup
-            run: |
-                sudo apt-get update
-                sudo apt-get install -y golang
-                echo "::set-output name=success::true"
-        -   name: Verify Go
-            run: go version
-
     process-files:
         needs: [install-python, install-nodejs, install-go]
         runs-on: ubuntu-latest
@@ -119,16 +105,11 @@ jobs:
             if: ${{ needs.install-nodejs.outputs.nodejs-installed == 'true' }}
             run: node --version
 
-        -   name: Verify Go Installation
-            if: ${{ needs.install-go.outputs.go-installed == 'true' }}
-            run: go version
-
         -   name: Use installed programs
             run: |
                 echo "All installations successful. Running tasks..."
                 python3 -c "print('Python is ready!')"
                 node -e "console.log('Node.js is ready!')"
-                go run -e "fmt.Println('Go is ready!')"
 
     # test_Klayout:
     #     needs: install_Klayout
