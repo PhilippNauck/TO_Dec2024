@@ -65,12 +65,77 @@ jobs:
             -   name: check installation
                 run: klayout -v
 
-    test_Klayout:
-        needs: install_Klayout
-        runs-on: ubuntu-22.04
+    install-python:
+        runs-on: ubuntu-latest
+        outputs:
+        python-installed: ${{ steps.python-setup.outputs.success }}
         steps:
-            -   name: check installation
-                run: klayout -v
+        -   name: Install Python
+            id: python-setup
+            run: |
+                sudo apt-get update
+                sudo apt-get install -y python3
+                echo "::set-output name=success::true"
+        -   name: Verify Python
+            run: python3 --version
+
+    install-nodejs:
+        runs-on: ubuntu-latest
+        outputs:
+            nodejs-installed: ${{ steps.node-setup.outputs.success }}
+        steps:
+        -   name: Install Node.js
+            id: node-setup
+            run: |
+                curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+                sudo apt-get install -y nodejs
+                echo "::set-output name=success::true"
+        -   name: Verify Node.js
+            run: node --version
+
+    install-go:
+        runs-on: ubuntu-latest
+        outputs:
+            go-installed: ${{ steps.go-setup.outputs.success }}
+        steps:
+        -   name: Install Go
+            id: go-setup
+            run: |
+                sudo apt-get update
+                sudo apt-get install -y golang
+                echo "::set-output name=success::true"
+        -   name: Verify Go
+            run: go version
+
+    process-files:
+        needs: [install-python, install-nodejs, install-go]
+        runs-on: ubuntu-latest
+        steps:
+        -   name: Verify Python Installation
+            if: ${{ needs.install-python.outputs.python-installed == 'true' }}
+            run: python3 --version
+
+        -   name: Verify Node.js Installation
+            if: ${{ needs.install-nodejs.outputs.nodejs-installed == 'true' }}
+            run: node --version
+
+        -   name: Verify Go Installation
+            if: ${{ needs.install-go.outputs.go-installed == 'true' }}
+            run: go version
+
+        -   name: Use installed programs
+            run: |
+                echo "All installations successful. Running tasks..."
+                python3 -c "print('Python is ready!')"
+                node -e "console.log('Node.js is ready!')"
+                go run -e "fmt.Println('Go is ready!')"
+
+    # test_Klayout:
+    #     needs: install_Klayout
+    #     runs-on: ubuntu-22.04
+    #     steps:
+    #         -   name: check installation
+    #             run: klayout -v
 
 # jobs:
 #     drc:
