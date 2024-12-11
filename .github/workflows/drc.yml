@@ -76,10 +76,10 @@ jobs:
 
       - name: Install KLayout
         run: |
-          sudo apt-get update
-          # sudo apt-get install -y ./klayout_0.29.6-1_amd64.deb
-          sudo dpkg ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
-
+            sudo apt-get update
+            # sudo apt-get install -y ./klayout_0.29.6-1_amd64.deb
+            sudo dpkg ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
+            sudo apt install -f -y
       - name: Verify Installation
         id: verify
         run: |
