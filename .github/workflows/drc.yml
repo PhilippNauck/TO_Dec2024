@@ -52,8 +52,7 @@ jobs:
                 run: sudo apt update -qq -y
 
             -   name: Installing Klayout
-                run: pwd
-                #run: sudo dpkg -i ./drc/klayout_0.29.6-1_amd64.deb || true
+                run: sudo dpkg -i ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
 
             -   name: apt install
                 run: sudo apt install -f -y
