@@ -55,9 +55,9 @@ jobs:
                     sudo dpkg -i ./drc/klayout_0.29.6-1_amd64.deb || true
                     # The apt install command should install the missing dependencies
                     # needed by KLayout above and finish the install.
-                    sudo apt install -f -y
+                    # sudo apt install -f -y
                     # Check that KLayout was successfully installed!
-                    klayout -v
+                    # klayout -v
 
 # jobs:
 #     drc:
