@@ -66,7 +66,7 @@ jobs:
                 run: klayout -v
 
     install-python:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         outputs:
             python-installed: ${{ steps.python-setup.outputs.success }}
         steps:
@@ -80,7 +80,7 @@ jobs:
             run: python3 --version
 
     install-nodejs:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         outputs:
             nodejs-installed: ${{ steps.node-setup.outputs.success }}
         steps:
@@ -94,7 +94,7 @@ jobs:
             run: node --version
 
     install-klayout:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         outputs:
             klayout-installed: ${{ steps.klayout-setup.outputs.success }}
         steps:
@@ -113,7 +113,7 @@ jobs:
 
     process-files:
         needs: [install-python, install-nodejs, install-klayout]
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
         -   name: Verify Python Installation
             if: ${{ needs.install-python.outputs.python-installed == 'true' }}
