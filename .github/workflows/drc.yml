@@ -39,7 +39,13 @@ on:
                 default: 'file1.txt,file2.txt'
 
 jobs:
+    copy_repo:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Get all files
+                uses: actions/checkout@master
     install_Klayout:
+        needs: copy_repo
         runs-on: ubuntu-latest
         steps:
             -   name: Installing Klayout
