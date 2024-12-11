@@ -83,7 +83,7 @@ jobs:
       - name: Verify Installation
         id: verify
         run: |
-          if ! command -v klayout > /dev/null; then
+          if ! klayout -v > /dev/null; then
             echo "KLayout not installed correctly!"
             exit 1
           fi
