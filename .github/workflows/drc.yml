@@ -68,7 +68,7 @@ jobs:
     install-python:
         runs-on: ubuntu-latest
         outputs:
-        python-installed: ${{ steps.python-setup.outputs.success }}
+            python-installed: ${{ steps.python-setup.outputs.success }}
         steps:
         -   name: Install Python
             id: python-setup
