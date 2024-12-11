@@ -15,12 +15,22 @@
 # SPDX-License-Identifier: Apache-2.0
 #==========================================================================
 
+#==========================================================================
+# Name Regex:
+#       FMD_QNC_.*\.gds
+#
+# Supported file formats:
+#       - .gds
+#       - .zip
+#       - .gz (Archive may only contain one gds file)
+#==========================================================================
+
 name: DRC
 
 on: 
     push:
     pull_request:
-        types: [opened, reopened, edited]
+        branches: [ main]
     workflow_dispatch:
         inputs:
             files:
@@ -29,44 +39,9 @@ on:
                 default: 'file1.txt,file2.txt'
 
 jobs:
-    drc:
+    install_Klayout:
         runs-on: ubuntu-latest
         steps:
-            -   name: Get all files
-                uses: actions/checkout@master
-            -   name: Get changed files Push
-                if: github.event_name == 'push'
-                id: get-changed-files-Push
-                run: |
-                    git fetch origin ${{ github.event.before }}
-                    changed_files=$(git diff --diff-filter=ACMRT --name-only ${{ github.event.before }} ${{ github.sha }})
-                    files_json=$(echo "$changed_files" | jq -R -s -c 'split("\n") | map(select(length > 0))')
-                    echo $files_json
-                    echo "files=$files_json" >> $GITHUB_OUTPUT
-                shell: bash
-            -   name: Get changed files Pull
-                if: github.event_name == 'pull_request'
-                id: get-changed-files-Pull
-                run: |
-                    git fetch origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
-                    changed_files=$(git diff --diff-filter=ACMRT --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
-                    files_json=$(echo "$changed_files" | jq -R -s -c 'split("\n") | map(select(length > 0))')
-                    echo $files_json
-                    echo "files=$files_json" >> $GITHUB_OUTPUT
-                shell: bash
-            -   name: Use manually input
-                if: github.event_name == 'workflow_dispatch'
-                id: manual-files
-                run: |
-                  files_input="${{ github.event.inputs.files }}"
-                  
-                  files_json=$(echo "$files_input" | jq -R -s -c 'split(",") | map(select(length > 0))')
-                  echo $files_json
-                  echo "files=$files_json" >> $GITHUB_OUTPUT
-                shell: bash
-            -   name: Installing p7zip
-                run: |
-                    sudo apt-get install p7zip-full 
             -   name: Installing Klayout
                 run: |
                     sudo apt update -qq -y
@@ -77,113 +52,158 @@ jobs:
                     sudo apt install -f -y
                     # Check that KLayout was successfully installed!
                     klayout -v
-            -   name: drc
-                run: |
-                    klayout -v;
-                    files=${{ steps.get-changed-files-pull.outputs.files || steps.get-changed-files-push.outputs.files || steps.manual-files.outputs.files }}
-                    mkdir ${{ github.workspace }}/drc/Results
-                    result=true;
-                    Zips=0
 
-                    # Function to convert a Gitlab action list into an array
-                    function listToArray() {
-                        local input_string="$1"
+# jobs:
+#     drc:
+#         runs-on: ubuntu-latest
+#         steps:
+#             -   name: Get all files
+#                 uses: actions/checkout@master
+#             -   name: Get changed files Push
+#                 if: github.event_name == 'push'
+#                 id: get-changed-files-Push
+#                 run: |
+#                     git fetch origin ${{ github.event.before }}
+#                     changed_files=$(git diff --diff-filter=ACMRT --name-only ${{ github.event.before }} ${{ github.sha }})
+#                     files_json=$(echo "$changed_files" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+#                     echo $files_json
+#                     echo "files=$files_json" >> $GITHUB_OUTPUT
+#                 shell: bash
+#             -   name: Get changed files Pull
+#                 if: github.event_name == 'pull_request'
+#                 id: get-changed-files-Pull
+#                 run: |
+#                     git fetch origin ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }}
+#                     changed_files=$(git diff --diff-filter=ACMRT --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})
+#                     files_json=$(echo "$changed_files" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+#                     echo $files_json
+#                     echo "files=$files_json" >> $GITHUB_OUTPUT
+#                 shell: bash
+#             -   name: Use manually input
+#                 if: github.event_name == 'workflow_dispatch'
+#                 id: manual-files
+#                 run: |
+#                   files_input="${{ github.event.inputs.files }}"
 
-                        # 1. Remove the brackets and quotation marks
-                        cleaned_input=$(echo "$input_string" | sed 's/\[//g' | sed 's/\]//g' | sed 's/"//g')
+#                   files_json=$(echo "$files_input" | jq -R -s -c 'split(",") | map(select(length > 0))')
+#                   echo $files_json
+#                   echo "files=$files_json" >> $GITHUB_OUTPUT
+#                 shell: bash
+#             -   name: Installing p7zip
+#                 run: |
+#                     sudo apt-get install p7zip-full 
+#             -   name: drc
+#                 run: |
+#                     klayout -v;
+#                     files=${{ steps.get-changed-files-pull.outputs.files || steps.get-changed-files-push.outputs.files || steps.manual-files.outputs.files }}
+#                     mkdir ${{ github.workspace }}/drc/Results
+#                     result=true;
+#                     Zips=0
 
-                        # 2. Remove the commas and put spaces instead
-                        cleaned_input=$(echo "$cleaned_input" | sed 's/,/ /g')
+#                     # Function to convert a Gitlab action list into an array
+#                     function listToArray() {
+#                         local input_string="$1"
 
-                        # 3. Remove the \n and put spaces instead
-                        cleaned_input=$(echo "$cleaned_input" | sed 's/\\n/ /g')
+#                         # 1. Remove the brackets and quotation marks
+#                         cleaned_input=$(echo "$input_string" | sed 's/\[//g' | sed 's/\]//g' | sed 's/"//g')
 
-                        # 3. Optional: Entferne Leerzeichen am Anfang und Ende, sowie den "\n"
-                        # cleaned_input=$(echo "$cleaned_input" | tr -d '\n')
+#                         # 2. Remove the commas and put spaces instead
+#                         cleaned_input=$(echo "$cleaned_input" | sed 's/,/ /g')
 
-                        clean_array=($cleaned_input)
-                        echo "${clean_array[@]}"
-                    }
+#                         # 3. Remove the \n and put spaces instead
+#                         cleaned_input=$(echo "$cleaned_input" | sed 's/\\n/ /g')
 
-                    function RunDRC() {
-                        command_output=$(mktemp)
-                        klayout -b -r ${{ github.workspace }}/drc/drc.lydrc -rd "in_gds"="$1" -rd "report_file"="$2" | tee "$command_output"
+#                         # 3. Optional: Entferne Leerzeichen am Anfang und Ende, sowie den "\n"
+#                         # cleaned_input=$(echo "$cleaned_input" | tr -d '\n')
 
-                        OUTPUT=$(cat "$command_output")
+#                         clean_array=($cleaned_input)
+#                         echo "${clean_array[@]}"
+#                     }
 
-                        re="Number of DRC errors: [0-9]+"
-                        if [[ $OUTPUT =~ $re ]]; then
-                            NumberRe="[0-9]+"
-                            if [[ $BASH_REMATCH =~ $NumberRe ]]; then 
-                                if (($BASH_REMATCH == 0))
-                                then 
-                                    echo "DRC pass";
-                                else
-                                    echo "DRC fail";
-                                    result=false;
-                                fi
-                            else 
-                                echo "DRC fail";
-                                result=false;
-                            fi
-                        else
-                            echo "DRC fail";
-                            result=false;
-                        fi
-                    }
+#                     function RunDRC() {
+#                         command_output=$(mktemp)
+#                         klayout -b -r ${{ github.workspace }}/drc/drc.lydrc -rd "in_gds"="$1" -rd "report_file"="$2" | tee "$command_output"
 
-                    file_array=($(listToArray "$files"))
-                    for file in "${file_array[@]}"; do
-                        echo "Processing file: $file"
-                        FileRe="\.gds"
-                        if [[ $file =~ $FileRe ]]; then 
-                            ZipRe="\.zip"
-                            GDSRe="\.gds$"
-                            if [[ $file =~ $ZipRe ]]; then 
-                            
-                                ZIP_FILE="${{ github.workspace }}/${file}"
-                                # Target directory for unpacking
-                                EXTRACT_DIR="${ZIP_FILE%/*}/Folder$Zips"
+#                         OUTPUT=$(cat "$command_output")
 
-                                # Check whether the ZIP file exists
-                                if [[ ! -f "$ZIP_FILE" ]]; then
-                                    echo "ZIP-Datei nicht gefunden: $ZIP_FILE"
-                                    exit 1
-                                fi
+#                         re="Number of DRC errors: [0-9]+"
+#                         if [[ $OUTPUT =~ $re ]]; then
+#                             NumberRe="[0-9]+"
+#                             if [[ $BASH_REMATCH =~ $NumberRe ]]; then 
+#                                 if (($BASH_REMATCH == 0))
+#                                 then 
+#                                     echo "DRC pass";
+#                                 else
+#                                     echo "DRC fail";
+#                                     result=false;
+#                                 fi
+#                             else 
+#                                 echo "DRC fail";
+#                                 result=false;
+#                             fi
+#                         else
+#                             echo "DRC fail";
+#                             result=false;
+#                         fi
+#                     }
 
-                                7z x "$ZIP_FILE" -o"$EXTRACT_DIR"
+#                     file_array=($(listToArray "$files"))
+#                     for file in "${file_array[@]}"; do
+#                         echo "Processing file: $file"
+#                         FileRe="\.gds"
+#                         if [[ $file =~ $FileRe ]]; then 
+#                             ZipRe="\.zip"
+#                             GDSRe="\.gds$"
+#                             GDSGZRe="\.gds.gz$"
+#                             if [[ $file =~ $ZipRe ]]; then 
 
-                                file_extension=gds
+#                                 ZIP_FILE="${{ github.workspace }}/${file}"
+#                                 # Target directory for unpacking
+#                                 EXTRACT_DIR="${ZIP_FILE%/*}/Folder$Zips"
 
-                                file_array=($(find "$EXTRACT_DIR" -type f -iname "*$file_extension"))
+#                                 # Check whether the ZIP file exists
+#                                 if [[ ! -f "$ZIP_FILE" ]]; then
+#                                     echo "ZIP-Datei nicht gefunden: $ZIP_FILE"
+#                                     exit 1
+#                                 fi
 
-                                echo "Files found:"
-                                for ZipContentFile in "${file_array[@]}"; do
-                                    echo "$ZipContentFile"
+#                                 7z x "$ZIP_FILE" -o"$EXTRACT_DIR"
 
-                                    echo "Run DRC for $ZipContentFile";
-                                    path=$ZipContentFile;
-                                    resultpath=${{ github.workspace }}/drc/Results/${ZipContentFile//[\/.]/_}.lyrdb;
-                                    
-                                    RunDRC ${path} ${resultpath}
-                                done
-                                Zips=$((Zips + 1))
-                            elif [[ $file =~ $GDSRe ]]; then
-                                echo "Run DRC for $file";
-                                path=${{ github.workspace }}/${file};
-                                resultpath=${{ github.workspace }}/drc/Results/${file//[\/.]/_}.lyrdb;
-                            RunDRC ${path} ${resultpath}
-                            fi
-                        fi
-                    done
-                    if [[ $result == false ]]
-                    then 
-                        exit 130 
-                    fi
-                shell: bash
-            -   name: Archive DRC Results
-                uses: actions/upload-artifact@v4
-                if: always()
-                with:
-                    name: DRC-Results
-                    path: ${{ github.workspace }}/drc/Results
+#                                 file_extension=gds
+
+#                                 file_array=($(find "$EXTRACT_DIR" -type f -iname "*$file_extension"))
+
+#                                 echo "Files found:"
+#                                 for ZipContentFile in "${file_array[@]}"; do
+#                                     echo "$ZipContentFile"
+
+#                                     echo "Run DRC for $ZipContentFile";
+#                                     path=$ZipContentFile;
+#                                     resultpath=${{ github.workspace }}/drc/Results/${ZipContentFile//[\/.]/_}.lyrdb;
+#                                     RunDRC ${path} ${resultpath}
+#                                 done
+#                                 Zips=$((Zips + 1))
+#                             elif [[ $file =~ $GDSRe ]]; then
+#                                 echo "Run DRC for $file";
+#                                 path=${{ github.workspace }}/${file};
+#                                 resultpath=${{ github.workspace }}/drc/Results/${file//[\/.]/_}.lyrdb;
+#                                 RunDRC ${path} ${resultpath}
+#                             elif [[ $file =~ $GDSGZRe ]]; then
+#                                 echo "Run DRC for $file";
+#                                 path=${{ github.workspace }}/${file};
+#                                 resultpath=${{ github.workspace }}/drc/Results/${file//[\/.]/_}.lyrdb;
+#                                 RunDRC ${path} ${resultpath}
+#                             fi
+#                         fi
+#                     done
+#                     if [[ $result == false ]]
+#                     then 
+#                         exit 130 
+#                     fi
+#                 shell: bash
+#             -   name: Archive DRC Results
+#                 uses: actions/upload-artifact@v4
+#                 if: always()
+#                 with:
+#                     name: DRC-Results
+#                     path: ${{ github.workspace }}/drc/Results
