@@ -52,13 +52,14 @@ jobs:
                 run: sudo apt update -qq -y
 
             -   name: Installing Klayout
-                run: sudo dpkg -i ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
+                run: ls
+            #     run: sudo dpkg -i ${{ github.workspace }}/drc/klayout_0.29.6-1_amd64.deb || true
 
-            -   name: apt install
-                run: sudo apt install -f -y
+            # -   name: apt install
+            #     run: sudo apt install -f -y
     
-            -   name: check installation
-                run: klayout -v    
+            # -   name: check installation
+            #     run: klayout -v    
 
 # jobs:
 #     drc:
