@@ -94,7 +94,7 @@ jobs:
             run: node --version
 
     process-files:
-        needs: [install-python, install-nodejs, install-go]
+        needs: [install-python, install-nodejs]
         runs-on: ubuntu-latest
         steps:
         -   name: Verify Python Installation
