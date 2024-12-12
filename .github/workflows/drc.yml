@@ -82,7 +82,7 @@ jobs:
     -   name: Verify Installation
         id: verify
         run: |
-          locate Klayout
+          sudo find / -name Klayout -type d
           echo "::set-output name=success::true"
 
   # process-with-klayout:
