@@ -84,14 +84,28 @@ jobs:
         run: |
           which klayout
           echo "::set-output name=success::true"
+    -   name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Klayout
+          path: /usr/bin/klayout
 
-  # process-with-klayout:
-  #   needs: install-klayout
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - name: Check KLayout availability
-  #       if: ${{ needs.install-klayout.outputs.klayout-installed == 'true' }}
-  #       run: klayout -v
+  process-with-klayout:
+    needs: install-klayout
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Klayout
+          path: /usr/bin/klayout
+      - name: testList
+        run: |
+          cd /usr/bin/klayout
+          ls
+      - name: Check KLayout availability
+        if: ${{ needs.install-klayout.outputs.klayout-installed == 'true' }}
+        run: klayout -v
 
   #     - name: Run KLayout task
   #       run: |
