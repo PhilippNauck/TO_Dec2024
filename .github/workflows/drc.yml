@@ -83,7 +83,7 @@ jobs:
         id: verify
         run: |
           which klayout
-          cd /usr/bin/klayout
+          cd /usr/bin
           ls
           echo "::set-output name=success::true"
     -   name: Archive production artifacts
