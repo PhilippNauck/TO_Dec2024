@@ -103,6 +103,7 @@ jobs:
       - name: testList
         run: |
           ls
+          ./klayout
 
   #     - name: Run KLayout task
   #       run: |
