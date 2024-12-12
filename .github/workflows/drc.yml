@@ -88,6 +88,8 @@ jobs:
           ls
           cd runner
           ls
+          cd work
+          ls
           echo "::set-output name=success::true"
 
   # process-with-klayout:
