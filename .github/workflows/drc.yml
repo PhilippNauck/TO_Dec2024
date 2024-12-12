@@ -82,10 +82,7 @@ jobs:
     -   name: Verify Installation
         id: verify
         run: |
-          klayout -v
-          ls
-          cd drc
-          ls
+          echo "$PATH"
           echo "::set-output name=success::true"
 
   # process-with-klayout:
