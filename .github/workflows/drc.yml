@@ -102,11 +102,7 @@ jobs:
           name: Klayout
       - name: testList
         run: |
-          cd /usr/bin
           ls
-      - name: Check KLayout availability
-        if: ${{ needs.install-klayout.outputs.klayout-installed == 'true' }}
-        run: klayout -v
 
   #     - name: Run KLayout task
   #       run: |
