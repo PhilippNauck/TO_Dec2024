@@ -102,7 +102,7 @@ jobs:
       - name: Restore Custom Binaries to /usr/bin
         run: |
           ls
-          sudo cp custom-bin/* /usr/bin/
+          sudo cp * /usr/bin/
       - name: testList
         run: |
           ls
