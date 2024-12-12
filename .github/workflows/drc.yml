@@ -101,6 +101,7 @@ jobs:
           name: usr-bin-custom
       - name: Restore Custom Binaries to /usr/bin
         run: |
+          ls
           sudo cp custom-bin/* /usr/bin/
       - name: testList
         run: |
