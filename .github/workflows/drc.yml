@@ -90,17 +90,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Klayout
-          path: /usr/bin
+          path: /usr/bin/klayout
 
   process-with-klayout:
     needs: install-klayout
     runs-on: ubuntu-22.04
     steps:
       - name: Archive code coverage results
-        uses: actions/upload-artifact@v4
+        uses: actions/download-artifact@v4
         with:
           name: Klayout
-          path: /usr/bin
       - name: testList
         run: |
           cd /usr/bin
