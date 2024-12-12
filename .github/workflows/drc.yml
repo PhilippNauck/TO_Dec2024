@@ -103,6 +103,8 @@ jobs:
         run: |
           ls
           sudo cp * /usr/bin/
+          cd /usr/bin/
+          ls
       - name: testList
         run: |
           ls
