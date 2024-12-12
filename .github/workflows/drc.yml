@@ -106,7 +106,7 @@ jobs:
       - name: testList
         run: |
           ls
-          klayout -v
+          sudo klayout -v
 
   #     - name: Run KLayout task
   #       run: |
