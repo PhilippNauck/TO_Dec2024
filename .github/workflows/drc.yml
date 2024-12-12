@@ -102,6 +102,7 @@ jobs:
       - name: Restore Custom Binaries to /usr/bin
         run: |
           ls
+          ./klayout
           sudo cp * /usr/bin/
           cd /usr/bin/
           ls
