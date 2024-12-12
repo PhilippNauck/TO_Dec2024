@@ -85,6 +85,7 @@ jobs:
           klayout -v
           ls
           cd drc
+          ls
           echo "::set-output name=success::true"
 
   # process-with-klayout:
