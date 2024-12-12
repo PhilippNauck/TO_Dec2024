@@ -83,14 +83,14 @@ jobs:
         id: verify
         run: |
           which klayout
-          cd /usr/bin
-          ls
+          mkdir -p custom-bin
+          cp /usr/bin/klayout custom-bin/
           echo "::set-output name=success::true"
     -   name: Archive production artifacts
         uses: actions/upload-artifact@v4
         with:
           name: Klayout
-          path: klayout
+          path: custom-bin
 
   process-with-klayout:
     needs: install-klayout
@@ -100,10 +100,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: Klayout
+      - name: Restore Custom Binaries to /usr/bin
+        run: |
+          sudo cp custom-bin/* /usr/bin/
       - name: testList
         run: |
           ls
-          sudo ./klayout
+          klayout -v
 
   #     - name: Run KLayout task
   #       run: |
