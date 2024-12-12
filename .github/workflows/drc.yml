@@ -82,7 +82,7 @@ jobs:
     -   name: Verify Installation
         id: verify
         run: |
-          find / -type d -name 'Klayout'
+          locate Klayout
           echo "::set-output name=success::true"
 
   # process-with-klayout:
