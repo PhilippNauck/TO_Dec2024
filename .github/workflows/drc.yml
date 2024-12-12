@@ -102,12 +102,12 @@ jobs:
       - name: Restore Custom Binaries to /usr/bin
         run: |
           ls
-          sudo ./klayout
           sudo cp * /usr/bin/
           cd /usr/bin/
           ls
       - name: testList
         run: |
+          cd klayout
           ls
           sudo klayout -v
 
