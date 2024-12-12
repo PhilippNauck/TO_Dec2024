@@ -82,7 +82,8 @@ jobs:
     -   name: Verify Installation
         id: verify
         run: |
-          echo "$PATH"
+          cd /
+          ls
           echo "::set-output name=success::true"
 
   # process-with-klayout:
