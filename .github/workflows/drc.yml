@@ -84,6 +84,11 @@ jobs:
         run: |
           klayout -v
           ls
+          cd ..
+          ls
+          cd ..
+          ls
+          pwd
           echo "::set-output name=success::true"
 
   # process-with-klayout:
