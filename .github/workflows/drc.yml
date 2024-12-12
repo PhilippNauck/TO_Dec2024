@@ -82,16 +82,7 @@ jobs:
     -   name: Verify Installation
         id: verify
         run: |
-          cd /
-          ls
-          cd home
-          ls
-          cd runner
-          ls
-          cd work
-          ls
-          cd TO_Dec2024
-          ls
+          find / -type d -name 'Klayout'
           echo "::set-output name=success::true"
 
   # process-with-klayout:
